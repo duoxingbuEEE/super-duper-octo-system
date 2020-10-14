@@ -2,7 +2,7 @@
 	<view class="">
 		<!-- 搜索框区域 -->
 		<view class="head">
-			<image src="../../static/index/logo.jpg" mode="widthFix"></image>
+			<image src="../../static/index/logo.png" mode="widthFix"></image>
 			<view class="searchview">
 				<input type="text" value="" placeholder="寻找商品" @focus="getsearch" />
 			</view>

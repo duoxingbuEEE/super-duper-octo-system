@@ -1,7 +1,7 @@
 <template>
 	<view class="box">
 		<!-- logo -->
-		<image class="logo" mode="widthFix" src="../../static/index/logo.jpg" alt="" />
+		<image class="logo" mode="widthFix" src="../../static/index/logo.png" alt="" />
 		<view class="login" hover-class="change">
 			<!-- 注意个人开发者不允许获取用户的手机号 -->
 			<button type="default" style="background-color: orangered;color: white;width: 100%;" open-type="getUserInfo"
