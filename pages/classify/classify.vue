@@ -3,13 +3,14 @@
 		<!-- left左侧一级分类列表 -->
 		<scroll-view scroll-y class="left">
 			<!-- 循环遍历的 -->
-			<view class="left_list" :class="activeIndex == ind ? 'activeList' : ''" v-for="(item,ind) in cateData" :key="ind" @click="changecate(ind)">
+			<view class="left_list" :class="activeIndex == ind ? 'activeList' : ''" v-for="(item,ind) in cateData" :key="ind"
+			 @click="changecate(ind)">
 				<label for="">{{ item.catename }}</label>
 			</view>
 		</scroll-view>
 		<!-- right右侧二级分类详情 -->
 		<scroll-view scroll-y class="right">
-			<view class="row" >
+			<view class="row">
 				<view class="row_list" v-for="(item,index) in classify" :key="index" @click="getlist(item.id)">
 					<image :src="item.img" mode="widthFix"></image>
 					<text>{{item.catename}}</text>
@@ -21,52 +22,74 @@
 
 <script>
 	export default {
-		data(){
+		data() {
 			return {
-				activeIndex:0,
-				cateData:['家电','手机','电脑'],//左侧一级分类数据
-				classify:[
-					{catename:"华为电脑",img:"../../static/classify/1.jpg"},
-					{catename:"华为电脑",img:"../../static/classify/2.jpg"},
-					{catename:"华为电脑",img:"../../static/classify/3.jpg"},
-					{catename:"华为电脑",img:"../../static/classify/4.jpg"},
-				]//右侧二级分类详情	
+				activeIndex: 0,
+				cateData: ['家电', '手机', '电脑'], //左侧一级分类数据
 			}
 		},
-		onLoad() {
-			// 获取全部的商品分类数据
-			this.getCate()
+		computed:{
+			classify(){ //右侧二级分类详情	
+				return this.cateData[this.activeIndex] ? this.cateData[this.activeIndex].children : [{
+						catename: "华为电脑",
+						img: "../../static/classify/1.jpg"
+					},
+					{
+						catename: "华为电脑",
+						img: "../../static/classify/2.jpg"
+					},
+					{
+						catename: "华为电脑",
+						img: "../../static/classify/3.jpg"
+					},
+					{
+						catename: "华为电脑",
+						img: "../../static/classify/4.jpg"
+					},
+				] 
+			}
 		},
-		methods:{
+		async onLoad(options) {
+			// console.log(options);
+			this.activeIndex = options.index || 0;
+			// 获取全部的商品分类数据
+			await this.getCate();
+		},
+		methods: {
 			// 获取二级分类下对应的商品列表数据
-			getlist(id){
-				uni.navigateTo({
-					url:"../product/product?id="+id
+			getlist(id) {
+				// uni.navigateTo({
+				// 	url: "../product/product?id=" + id
+				// })
+				this.navTo({
+					url: "../product/product",
+					data: {
+						id
+					}
 				})
 			},
 			// 切换二级分类
-			changecate(index){
+			changecate(index) {
 				this.activeIndex = index;
-				this.classify = this.cateData[index].children;
 			},
 			// 获取全部分类数据
-			getCate(){
-				this.$http({
-					url:"getcates"
+			async getCate() {
+				let {
+					data: {
+						list: cateData
+					}
+				} = await this.$http({
+					url: "getcates"
 				})
-				.then(res=>{
-					let data = res.data.list;
-					// 循环处理分类中的图片路径
-					data.forEach((item)=>{
-						if(item.children){
-							item.children.forEach((item)=>{
-								item.img = this.$URL+item.img
-							})
-						}
-					})
-					this.cateData = data;
-					this.classify = this.cateData[this.activeIndex].children;
+				// 循环处理分类中的图片路径
+				cateData.forEach((item) => {
+					if (item.children) {
+						item.children.forEach((item) => {
+							item.img = this.$URL + item.img
+						})
+					}
 				})
+				this.cateData = cateData;
 			},
 		}
 	}
@@ -75,9 +98,9 @@
 <style>
 	/* 导入外部的样式文件 */
 	@import url("../../common/css/classify.css");
-	
+
 	/* 点击左侧导航，显示动态样式 */
-	.activeList{
+	.activeList {
 		border-left: 6rpx solid #f26b11;
 		color: #f26b11;
 	}

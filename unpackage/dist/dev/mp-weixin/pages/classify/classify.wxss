@@ -73,6 +73,29 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* 导入外部的样式文件 */
 .container{
 	display: -webkit-box;
@@ -127,7 +150,7 @@
 	width: 120rpx;
 }
 /* 点击左侧导航，显示动态样式 */
-.activeList{
+.activeList {
 	border-left: 6rpx solid #f26b11;
 	color: #f26b11;
 }

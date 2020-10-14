@@ -18,14 +18,27 @@
 </template>
 
 <script>
+	let app = getApp();
 	export default {
 		data() {
 			return {}
 		},
-		onLoad() {},
+		onLoad() {
+			if (app.globalData.loginstatus) {
+				// uni.reLaunch({
+				// 	url: "../mine/mine"
+				// })
+				this.reLaunch({
+					url: "../mine/mine"
+				})
+			}
+		},
 		methods: {
 			send() {
-				uni.navigateTo({
+				// uni.navigateTo({
+				// 	url: '../send/send'
+				// })
+				this.navTo({
 					url: '../send/send'
 				})
 			}

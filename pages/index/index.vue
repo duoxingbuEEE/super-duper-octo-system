@@ -87,7 +87,7 @@
 				</view>
 			</view>
 			<view class="recommendlist">
-				<view class="recommendrow" v-for="(item,index) in goods" :key="index">
+				<view class="recommendrow" v-for="(item,index) in goods" :key="index" @click="toDetail(item.id)">
 					<image :src="item.img" mode="widthFix"></image>
 					<view class="recommendrowinfo">
 						<text>{{item.goodsname}}</text>
@@ -117,7 +117,7 @@
 					s: '00'
 				}, //倒计时数据
 				products: [], //热销、上新、所有商品数据
-				goods: [], //默认展示推荐商品数据
+				// goods: [], //默认展示推荐商品数据
 				menuIndex: 0, //推荐商品选项卡默认下标
 				funNavList: [{ //功能导航数据
 						name: "限时抢购",
@@ -138,6 +138,11 @@
 				],
 			}
 		},
+		computed: {
+			goods() { //默认展示推荐商品数据
+				return this.products[this.menuIndex] ? this.products[this.menuIndex].content : [];
+			}
+		},
 		onLoad() {
 			// 获取导航分类
 			this.getnavCate()
@@ -149,59 +154,77 @@
 			this.gethortData()
 		},
 		methods: {
+			// 跳转到商品详情
+			toDetail(id){
+				this.navTo({
+					url: "../details/details",
+					data: {
+						id
+					}
+				})
+			},
 			// 跳转到商品分类页面
 			getcate(index) {
 				if (index == 3) {
-					uni.navigateTo({
-						url: '../classify/classify'
+					// uni.navigateTo({
+					// 	url: '../classify/classify'
+					// })
+					this.navTo({
+						url: "../classify/classify"
 					})
 				}
 			},
 
 			// 获取热门数据
-			gethortData() {
-				this.$http({
-						url: 'getindexgoods'
+			async gethortData() {
+				let {
+					data: {
+						list: products
+					}
+				} = await this.$http({
+					url: 'getindexgoods'
+				})
+				
+				// 循环处理图片路径
+				products.forEach((item) => {
+					item.content.forEach((item) => {
+						item.img = this.$URL + item.img
 					})
-					.then(res => {
-						let data = res.data.list;
-						// 循环处理图片路径
-						data.forEach((item) => {
-							item.content.forEach((item) => {
-								item.img = this.$URL + item.img
-							})
-						});
+				});
 
-						this.products = data;
-						// 默认展示推荐商品数据
-						this.goods = this.products[this.menuIndex].content;
-					})
+				this.products = products;
+				// 默认展示推荐商品数据
+				// this.goods = this.products[this.menuIndex].content;
 			},
 
 			// 切换推荐选项卡
 			changeMenu(index) {
 				this.menuIndex = index;
-				this.goods = this.products[index].content;
+				// this.goods = this.products[index].content;
 			},
 
 			// 定义获取秒杀数据
-			getSkill() {
-				this.$http({
-						url: 'getseckill'
-					})
-					.then(res => {
-						let data = res.data.list[0];
-						// 处理图片路径
-						data.img = this.$URL + data.img;
-						this.skillData = data;
-						// 处理倒计时
-						this.countDown(data.endtime)
-					})
+			async getSkill() {
+				let {
+					data: {
+						list
+					}
+				} = await this.$http({
+					url: 'getseckill'
+				})
+				// console.log(list);
+				let skillData = list[0];
+				// console.log(skillData);
+				// 处理图片路径
+				skillData.img = this.$URL + skillData.img;
+				this.skillData = skillData;
+				// 处理倒计时
+				this.countDown(skillData.endtime)
 			},
 
 			// 定义倒计时方法
 			countDown(time) {
-				let nowTime = new Date().getTime();
+				let nowTime = Date.now();
 				let leftTime = time - nowTime;
 				if (leftTime > 0) {
 					let h = Math.ceil(leftTime / 1000 / 60 / 60 % 24);
@@ -228,33 +251,46 @@
 			},
 
 			// 获取首页轮播图
-			getbanner() {
-				this.$http({
-						url: 'getbanner'
-					})
-					.then(res => {
-						let data = res.data.list;
-						// 处理图片的域名问题
-						data.forEach((item) => {
-							item.img = this.$URL + item.img
-						})
-						this.swipers = data;
-					})
+			async getbanner() {
+				let {
+					data: {
+						list
+					}
+				} = await this.$http({
+					url: 'getbanner'
+				})
+				// console.log(list);
+				list.forEach((item) => {
+					item.img = this.$URL + item.img
+				})
+				this.swipers = list;
 			},
 
 			// 切换导航分类
 			changenav(index) {
-				this.topindex = index
+				this.topindex = index;
+				// uni.navigateTo({
+				// 	url: "../classify/classify?index=" + index
+				// })
+				this.navTo({
+					url: "../classify/classify",
+					data: {
+						index
+					}
+				})
 			},
 
 			// 获取首页导航分类
-			getnavCate() {
-				this.$http({
-						url: 'getcate'
-					})
-					.then(res => {
-						this.quicknav = res.data.list
-					})
+			async getnavCate() {
+				let {
+					data: {
+						list: quicknav
+					}
+				} = await this.$http({
+					url: 'getcate'
+				})
+				// console.log(quicknav);
+				this.quicknav = quicknav
 			},
 		}
 	}

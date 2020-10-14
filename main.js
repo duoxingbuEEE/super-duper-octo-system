@@ -18,10 +18,17 @@ Vue.prototype.$http = http;
 import URL from '@/utils/config.js';
 Vue.prototype.$URL = URL;
 
+// 挂载跳转方法
+import {
+	navTo,
+	reLaunch
+} from "@/utils/navTo.js"
+Vue.prototype.navTo = navTo;
+Vue.prototype.reLaunch = reLaunch;
 
 // 实例化vue组件
 const app = new Vue({
-    ...App
+	...App
 })
 // 进行挂载
 app.$mount()

@@ -24,11 +24,18 @@ var _request = _interopRequireDefault(__webpack_require__(/*! @/utils/request.js
 
 
 
-var _config = _interopRequireDefault(__webpack_require__(/*! @/utils/config.js */ 12));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function ownKeys(object, enumerableOnly) {var keys = Object.keys(object);if (Object.getOwnPropertySymbols) {var symbols = Object.getOwnPropertySymbols(object);if (enumerableOnly) symbols = symbols.filter(function (sym) {return Object.getOwnPropertyDescriptor(object, sym).enumerable;});keys.push.apply(keys, symbols);}return keys;}function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};if (i % 2) {ownKeys(Object(source), true).forEach(function (key) {_defineProperty(target, key, source[key]);});} else if (Object.getOwnPropertyDescriptors) {Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));} else {ownKeys(Object(source)).forEach(function (key) {Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));});}}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;} // 取消生产提示
+var _config = _interopRequireDefault(__webpack_require__(/*! @/utils/config.js */ 12));
+
+
+
+var _navTo = __webpack_require__(/*! @/utils/navTo.js */ 13);function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function ownKeys(object, enumerableOnly) {var keys = Object.keys(object);if (Object.getOwnPropertySymbols) {var symbols = Object.getOwnPropertySymbols(object);if (enumerableOnly) symbols = symbols.filter(function (sym) {return Object.getOwnPropertyDescriptor(object, sym).enumerable;});keys.push.apply(keys, symbols);}return keys;}function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};if (i % 2) {ownKeys(Object(source), true).forEach(function (key) {_defineProperty(target, key, source[key]);});} else if (Object.getOwnPropertyDescriptors) {Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));} else {ownKeys(Object(source)).forEach(function (key) {Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));});}}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;} // 取消生产提示
 _vue.default.config.productionTip = false; //指定根组件类型
 _App.default.mpType = 'app'; // 挂载网络请求方法
 _vue.default.prototype.$http = _request.default; // 挂载网络请求域名
-_vue.default.prototype.$URL = _config.default; // 实例化vue组件
+_vue.default.prototype.$URL = _config.default; // 挂载跳转方法
+_vue.default.prototype.navTo = _navTo.navTo;_vue.default.prototype.reLaunch = _navTo.reLaunch;
+
+// 实例化vue组件
 var app = new _vue.default(_objectSpread({},
 _App.default));
 
@@ -103,12 +110,61 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;
 // 项目的根组件
 var _default = {
+  globalData: {
+    loginstatus: false, //true代码用户登录有效  false:登录无效
+    header: {
+      "content-type": "application/json",
+      "authorization": '' } },
 
-  onLaunch: function onLaunch() {
+
+
+  onLaunch: function onLaunch() {var _this = this;
+    // 根据缓存判断用户是否登录过
+    var userinfo = uni.getStorageSync("userinfo") || "";
+    if (userinfo == "") {
+      this.globalData.loginstatus = false;
+      uni.setTabBarItem({
+        index: 2,
+        text: "未登录" });
+
+    } else {
+      // token有效性检查
+      // 组装header
+      var
+      header =
+      this.globalData.header;
+      header.authorization = userinfo.token;
+      this.$http({
+        url: "checktoken",
+        header: header }).
+      then(function (res) {
+        if (res.data.msg != '登录有效') {
+          console.log('检测登录失效');
+          // 动态设置我的菜单下的文字为‘未登录’
+          uni.setTabBarItem({
+            index: 2,
+            text: '未登录' });
+
+          // 设置检测登录的开关状态
+          _this.globalData.loginstatus = false;
+          uni.showToast({
+            title: "登录已失效！",
+            icon: "none" });
+
+          return;
+        }
+        // 登录有效
+        _this.globalData.loginstatus = true;
+      }).catch(function (err) {
+        _this.globalData.loginstatus = false;
+        console.log(err);
+      });
+    }
   } };exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 
 /***/ }),
 /* 8 */

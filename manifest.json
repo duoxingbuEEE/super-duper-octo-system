@@ -116,6 +116,9 @@
     "h5" : {
         "devServer" : {
             "https" : false
+        },
+        "router" : {
+            "mode" : "hash"
         }
     }
 }
